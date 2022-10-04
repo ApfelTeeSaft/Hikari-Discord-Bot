@@ -24,7 +24,7 @@ bot = lightbulb.BotApp(token=os.environ["TOKEN"])  # Token aus .env Dateip
 )
 @lightbulb.option(
     "name", "insert name here", type=hikari.OptionType.STRING
-)  # @lightbulb.option erstellt eine option hinter einem befehl, type=hikari.OptionType.STRING setzt einen OptionType (Rollen,Integer,User) wobei dieser optiontype überprüft ob es sich um eine URL Handelt
+)  # @lightbulb.option erstellt eine option hinter einem befehl, type=hikari.OptionType.STRING setzt einen OptionType (Rollen,Integer,member) wobei dieser optiontype überprüft ob es sich um eine URL Handelt
 @lightbulb.option(
     "bild-url", "link to an image that should be send", type=validators.url
 )  # Bild Einfügen
@@ -69,14 +69,14 @@ async def add_emoji(ctx: lightbulb.Context) -> None:  # idk
 print("end")
 
 
-# /unban-member <user>
+# /unban-member <member>
 @bot.command
 @lightbulb.option(
-    "user", "the id of a user that should be unbanned", type=hikari.OptionType.USER
+    "member", "the id of a member that should be unbanned", type=hikari.OptionType.USER
 )
 @lightbulb.command("unban-member", "unbans a member")
 @lightbulb.implements(lightbulb.SlashCommand)
-async def unban_user(ctx: lightbulb.context) -> None:
+async def unban_member(ctx: lightbulb.context) -> None:
     guild = ctx.get_guild()
     id = ctx.options.user.id
     try:
@@ -84,7 +84,7 @@ async def unban_user(ctx: lightbulb.context) -> None:
         await ctx.respond(
             embed=hikari.Embed(
                 title="Success",
-                description="user is now unbanned from this guild",
+                description="member is now unbanned from this guild",
                 color="0C9E5A",
             )
         )
@@ -92,14 +92,14 @@ async def unban_user(ctx: lightbulb.context) -> None:
         await ctx.respond(error)
 
 
-# /ban-member <user> <reason>
+# /ban-member <member> <reason>
 @bot.command
 @lightbulb.option(
-    "user", "the id of the user that should be banned", type=hikari.OptionType.USER
+    "member", "the id of the member that should be banned", type=hikari.OptionType.USER
 )
-@lightbulb.command("ban-member", "bans a user")
+@lightbulb.command("ban-member", "bans a member")
 @lightbulb.implements(lightbulb.SlashCommand)
-async def ban_user(ctx: lightbulb.context) -> None:
+async def ban_member(ctx: lightbulb.context) -> None:
     guild = ctx.get_guild()
     id = ctx.options.user.id
     try:
@@ -109,75 +109,75 @@ async def ban_user(ctx: lightbulb.context) -> None:
     await ctx.respond(
         embed=hikari.Embed(
             title="Success",
-            description="user is now banned from this guild",
+            description="member is now banned from this guild",
             color="FF0000",
         )
     )
 
 
-# rndm command
+# /nsfw
 @bot.command
 @lightbulb.command("nsfw", "sends a random nsfw gif")
 @lightbulb.implements(lightbulb.SlashCommand)
 async def nsfw(ctx: lightbulb.context) -> None:
     await ctx.respond("https://c.tenor.com/nUaizsGhvtIAAAAd/the-rock-sus.gif")
-    print("exectuted nsfw") # <-- mit logging.info("exectuted nsfw") ersetzen? oder und zu discord channel log schreiben?
+    print("exectuted nsfw") # <-- mach ich dann nachher wenn ich wieder vom einkaufen bin
 
 
-# voice mute command
+# /voice-mute <member>
 @bot.command
 @lightbulb.option(
-    "id", "the id of the user that should be muted", type=hikari.OptionType.USER
+    "member", "the id of the member that should be muted", type=hikari.OptionType.USER
 )
-@lightbulb.command("voice-mute", "mutes a user in a voice channel")
+@lightbulb.command("voice-mute", "mutes a member in a voice channel")
 @lightbulb.implements(lightbulb.SlashCommand)
-async def mute_user(ctx: lightbulb.context) -> None:
+async def mute_member(ctx: lightbulb.context) -> None:
     guild = ctx.get_guild()
-    user = ctx.options.id
-    member = guild.get_member(user)
+    member = ctx.options.id
+    member = guild.get_member(member)
     mute = True
     self = ctx.options.id
     await member.edit(mute=True)
     if member.edit(mute=False):
         await ctx.respond(
             embed=hikari.Embed(
-                title="user is now muted", description="muted user in vc"
+                title="member is now muted", description="muted member in vc"
             )
         )
         return
     await ctx.respond(
         embed=hikari.Embed(
             title="cant mute member",
-            description="make sure youre using a valid id and that the user is in a vc",
+            description="make sure youre using a valid id and that the member is in a vc",
         )
     )
 
 
-# /voice-unmute <user> #! aktuell haben wir noch <id> als option würd ich umbenennen
+# /voice-unmute <member>
 @bot.command
 @lightbulb.option(
-    "id", "the id of the user that should be unmuted", type=hikari.OptionType.USER
-) # entweder id ODER user überall sollte einheitlich sein - wie machen wirs?
-@lightbulb.command("voice-unmute", "unmutes a user in a voice channel")
+    "member", "the member that should be unmuted", type=hikari.OptionType.USER
+)
+@lightbulb.command("voice-unmute", "unmutes a member in a voice channel")
 @lightbulb.implements(lightbulb.SlashCommand)
-async def unmute_user(ctx: lightbulb.context) -> None:
+async def unmute_member(ctx: lightbulb.context) -> None:
     guild = ctx.get_guild()
-    user = ctx.options.id
-    member = guild.get_member(user)
+    member = ctx.options.id
+    member = guild.get_member(member)
     mute = False
     self = ctx.options.id
     await member.edit(mute=False)
     if member.edit(mute=True):
         await ctx.respond(
             embed=hikari.Embed(
-                title="user is now unmuted", description="unmuted user in vc"
+                title="member is now unmuted", description="unmuted member in vc"
             )
         )
         return
     await ctx.respond(
         embed=hikari.Embed(
             title="cant unmute member",
-            description="make sure youre using a valid id and that the user is in a vc and muted",
+            description="make sure youre using a valid id and that the member is in a vc and muted",
         )
     )
 
